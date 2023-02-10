@@ -40,7 +40,7 @@ jobs:
 	  # publish_branch: gh-pages
 	  # publish_dir: hugo/public
 	  deploy_key: ${{ secrets.DEPLOY_KEY }}
-	  external_repository: superbear/superbear.github.io
+	  external_repository: nigo81/nigo81.github.io
 	  # 默认是master目录，github上可修改
 	  publish_branch: master
 	  publish_dir: hugo/public
