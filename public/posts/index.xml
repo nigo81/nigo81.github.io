@@ -1,0 +1,19 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>All Posts - 逆行的狗</title>
+        <link>http://example.org/posts/</link>
+        <description>All Posts | 逆行的狗</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tujiabing81@163.com (nigo)</managingEditor>
+            <webMaster>tujiabing81@163.com (nigo)</webMaster><lastBuildDate>Fri, 10 Feb 2023 00:12:00 &#43;0800</lastBuildDate><atom:link href="http://example.org/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>第一篇博客</title>
+    <link>http://example.org/posts/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</link>
+    <pubDate>Fri, 10 Feb 2023 00:12:00 &#43;0800</pubDate>
+    <author>nigo</author>
+    <guid>http://example.org/posts/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</guid>
+    <description><![CDATA[这是我的第一篇博客
+好吧
+有一点
+测试一下吧 ]]></description>
+</item>
+</channel>
+</rss>

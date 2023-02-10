@@ -1,0 +1,19 @@
+#+HUGO_BASE_DIR: ~/blog
+#+HUGO_SECTION: posts
+#+HUGO_AUTO_SET_LASTMOD: t
+#+author:
+#+hugo_custom_front_matter: :author "nigo"
+#+HUGO_CODE_FENCE: nil
+* Notes
+** DONE 第一篇博客                                                   :emacs:
+CLOSED: [2023-02-10 Fri 00:12]
+:PROPERTIES:
+:EXPORT_FILE_NAME: 第一篇博客
+:END:
+
+这是我的第一篇博客
+
+好吧
+
+有一点
+*** 测试一下吧 
