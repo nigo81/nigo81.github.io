@@ -1,0 +1,46 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Set a branch to deploy
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      # 修改时区
+      - name: Set Timezone
+	run: sudo timedatectl set-timezone 'Asia/Shanghai'
+
+      - uses: actions/checkout@v2
+	with:
+	  submodules: true  # Fetch Hugo themes (true OR recursive)
+	  fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup Hugo
+	uses: peaceiris/actions-hugo@v2
+	with:
+	  # 建议和本地用的版本保持一致，从而获得一致的体验
+	  hugo-version: '0.89.4'
+	  # extended: true
+
+      - name: Build
+	run: |
+	  hugo --source hugo --minify --buildFuture --buildExpired
+
+      - name: Deploy
+	uses: peaceiris/actions-gh-pages@v3
+	if: ${{ github.ref == 'refs/heads/main' }}
+	with:
+	  # github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+	  # publish_branch: gh-pages
+	  # publish_dir: hugo/public
+	  deploy_key: ${{ secrets.DEPLOY_KEY }}
+	  external_repository: superbear/superbear.github.io
+	  # 默认是master目录，github上可修改
+	  publish_branch: master
+	  publish_dir: hugo/public
