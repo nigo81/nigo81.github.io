@@ -73,14 +73,24 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
 
-  # 搜索数据上传algolia
-      - name: Upload Algolia Indexes
-        uses: iChochy/Algolia-Upload-Records@main
-        env:
-          APPLICATION_ID: ${{ secrets.ALGOLIA_APPID }}
-          ADMIN_API_KEY: ${{ secrets.ALGOLIA_ADMINKEY }}
-          INDEX_NAME: ${{ secrets.ALGOLIA_INDEXNAME }}
-          FILE_PATH: "./public/index.json"
+
+  upload_algolia_index:
+    runs-on: ubuntu-latest
+    name: Upload Algolia Index
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: wangchucheng/algolia-uploader@master
+      with:
+        # Such as `Z0U0ACGBN8`
+        app_id: ${{ secrets.ALGOLIA_APPID}}
+        # You can store token in your project's 'Setting > Secrets' and reference the name here. Such as ${{ secrets.ALGOLIA_ADMIN_KEY }}
+        admin_key: ${{ secrets.ALGOLIA_ADMINKEY}}
+        # The index name. 
+        index_name: ${{ secrets.ALGOLIA_INDEXNAME}}
+        # The index file path relative to repo root.
+        index_file_path: public/index.json
 
 
   sync: #同步到gitee仓库
