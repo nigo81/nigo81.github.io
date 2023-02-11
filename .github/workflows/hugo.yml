@@ -74,19 +74,15 @@ jobs:
         uses: actions/deploy-pages@v1
 
 # 将index.json索引上传到algigo（主要是为了能用搜索功能）
-      - name: Algolia Index Uploader
-        # You may pin to the exact commit or the version.
-        # uses: rxrw/algolia-index-uploader@294d1d600c4a2197a64903b6161cc80acea1becb
-        uses: rxrw/algolia-index-uploader@v1
-        with:
-          # Your Algolia IndexPath
-          index_path: public/index.json   # 生成的index.json位置，默认即可
-          # Algolia Index Id
-          algolia_index_id: L2PH9BYQ9X  # 你的indexId, 即之前获得的`application ID`
-          # Algolia Index Name
-          algolia_index_name: nigo81.gitee.io  # 你创建的index名字
-          # Algolia Admin Key
-          algolia_index_admin_key: 19987eb6158ae8873649ad30bbb5cea5  # 上图中获取的admin Key
+      - name: Algolia Upload Records
+        # 使用 Action
+        uses: iChochy/Algolia-Upload-Records@main
+        # 设置环境变量
+        env:
+          APPLICATION_ID: L2PH9BYQ9X
+          ADMIN_API_KEY: 19987eb6158ae8873649ad30bbb5cea5
+          INDEX_NAME: nigo81.gitee.io
+          FILE_PATH: public/index.json
 
   sync: #同步到gitee仓库
     needs: deploy
