@@ -1,8 +1,0 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
-    <channel>
-        <title>Categories - Category - 逆行的狗</title>
-        <link>http://example.org/categories/</link>
-        <description>Categories - Category - 逆行的狗</description>
-        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>tujiabing81@163.com (nigo)</managingEditor>
-            <webMaster>tujiabing81@163.com (nigo)</webMaster><atom:link href="http://example.org/categories/" rel="self" type="application/rss+xml" /></channel>
-</rss>
