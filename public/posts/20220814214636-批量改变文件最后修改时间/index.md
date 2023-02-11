@@ -1,0 +1,81 @@
+# 批量改变文件最后修改时间
+
+
+有网友问，怎么批量修改文件最后的修改日期。
+
+比如， excel 文件、 word 文件等。
+
+当然我们先将电脑日期设置成以前的某个日期，然后一个一个打开文件后，修改下，再保存。这样可以完成日期的更换。
+
+今天我们用 python 来实现文件修改日期的批量替换。
+
+{{< figure src="https://tujiabing-1258622425.cos.ap-chengdu.myqcloud.com/image_2022-07-19-23-18-29.png" >}}
+
+比如在=/home/nigo/tmp/test=文件夹下有一些文件，最后修改日期是=2022-07-19=。
+
+我们只需要做两步：
+
+1.  循环获取该文件夹所有文件路径。
+2.  修改文件日期
+
+我们先看修改文件日期：
+
+{{< highlight python >}}
+import os
+
+def change_file_date(path, atime, mtime):
+    """改变文件修改日期和访问日期"""
+    info = os.stat(path)
+    os.utime(path, (atime, mtime))
+{{< /highlight >}}
+
+我们只需要用`os.utime`函数就可以将文件的访问日期和修改日期分别改变为`atime`和 `mtime` （时间戳数字）。
+
+完整代码如下：
+
+{{< highlight python >}}
+import os
+import datetime
+
+def change_file_date(path, atime, mtime):
+    """改变文件修改日期和访问日期"""
+    info = os.stat(path)
+    os.utime(path, (atime, mtime))
+
+def get_file_list(dir, file_list):
+    """递归获取文件夹下所有的文件路径"""
+    newdir = dir
+    if os.path.isfile(dir):
+        file_list.append(dir)
+    elif os.path.isdir(dir):
+        for s in os.listdir(dir):
+            #如果需要忽略某些文件夹，使用以下代码
+            # if s == "xxx":
+                # continue
+            newdir=os.path.join(dir,s)
+            get_file_list(newdir, file_list)
+    return file_list
+
+if __name__ == "__main__":
+    # 需要修改的文件所在的文件夹
+    modify_directory = '/home/nigo/tmp/test'
+    # 需要设置成的修改时间：年,月,日,时,分,秒
+    modify_time = datetime.datetime(2022, 4, 5, 18, 20, 31)
+    # 将时期转化为时间戳
+    mtime = datetime.datetime.timestamp(modify_time)
+    # 获取指定文件夹下的所有文件路径
+    paths = get_file_list(modify_directory, [])
+    # 循环所有文件
+    for path in paths:
+        # 修改文件的访问时间和修改时间
+        change_file_date(path, mtime, mtime)
+{{< /highlight >}}
+
+我们执行代码将`/home/nigo/tmp/test`文件夹下的所有文件修改日期改变为`2022-04-05 18:20:31`。
+
+{{< figure src="https://tujiabing-1258622425.cos.ap-chengdu.myqcloud.com/image_2022-07-19-23-27-00.png" >}}
+
+可以看到所有文件的修改日期已全部批量修改。
+
+当然你会 VBA 的话，也可以使用 VBA 实现，只是用 Python 更快速一点。
+

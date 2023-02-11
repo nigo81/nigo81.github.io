@@ -1,0 +1,213 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>网络分析 - 标签 - 逆行的狗</title>
+        <link>https://nigo81.github.io/tags/%E7%BD%91%E7%BB%9C%E5%88%86%E6%9E%90/</link>
+        <description>网络分析 - 标签 - 逆行的狗</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>tujiabing81@163.com (nigo)</managingEditor>
+            <webMaster>tujiabing81@163.com (nigo)</webMaster><lastBuildDate>Sun, 14 Aug 2022 00:00:00 &#43;0000</lastBuildDate><atom:link href="https://nigo81.github.io/tags/%E7%BD%91%E7%BB%9C%E5%88%86%E6%9E%90/" rel="self" type="application/rss+xml" /><item>
+    <title>传销组织层级结构分析</title>
+    <link>https://nigo81.github.io/posts/20220814001303-%E4%BC%A0%E9%94%80%E7%BB%84%E7%BB%87%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/</link>
+    <pubDate>Sun, 14 Aug 2022 00:00:00 &#43;0000</pubDate>
+    <author>nigo</author>
+    <guid>https://nigo81.github.io/posts/20220814001303-%E4%BC%A0%E9%94%80%E7%BB%84%E7%BB%87%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/</guid>
+    <description><![CDATA[<p>前几天一个网友发了一个传销组织的数据，他想求每个层级的人数。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 1: <!-- raw HTML omitted -->图1</p>
+        </figcaption>
+</figure>
+
+<p>这两天正好学了<code>networkx</code>，我们来看如果用网络分析解决这个问题。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 2: <!-- raw HTML omitted -->图2</p>
+        </figcaption>
+</figure>
+
+<p>这是整个推荐关系的可视化网络图。其中正红色的点为根节点。</p>
+<p>下面我们一步一步来解决。</p>
+<h2 id="读取数据并创建网络">读取数据并创建网络</h2>
+<p>我们使用<code>pandas</code>读取 excel 数据，并用<code>nx.from_pandas_edgelist(df,source,target,edge_attr,create_using)</code>函数来创建一个图=G=。</p>
+<p>这个函数是根据边数据来创建图，其中：</p>
+<ul>
+<li>source:df中表示边起始的列名（推荐人）。</li>
+<li>target:df中表示边目标的列名（被推荐人）。</li>
+<li>edge\_attr:df中表示边属性的列名（如权重，颜色，大小等）。</li>
+<li>create\_using:表示创建什么类型的图，无向图，有向图等。这里我们使用有向图=DiGraph=,因为推荐关系是有方向的。</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 读取数据创建图</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;~/传销原始数据.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;推荐人ID&#39;</span><span class="p">,</span> <span class="s1">&#39;被推荐人ID&#39;</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">())</span></span></span></code></pre></div>
+<p>当然这样创建的图=G=只是一个类的实例化，并不一张真正可视化的图。如果你想可视化它，可以使用=pyvis=包进行，它可以生成一个可交互的网络图。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyvis.network</span> <span class="kn">import</span> <span class="n">Network</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;650px&#39;</span><span class="p">,</span> <span class="s1">&#39;1250px&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">from_nx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s1">&#39;test.html&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<p>这将会生成如图 2 所示的网络图。</p>
+<h2 id="找到根节点">找到根节点</h2>
+<p>考虑到这个网络是一个传销组织，那么正常情况下应该是有个唯一的根节点，整个组织类似树状结构。</p>
+<p>我们先得找到这个根节点，怎么找呢？</p>
+<p>这就需要先引一个图论中的概念<strong>度</strong>，度的意思就是一个节点的相邻节点的数量。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 3: <!-- raw HTML omitted -->图3</p>
+        </figcaption>
+</figure>
+
+<p>如图 3 所示，如果不考虑边的方向，那点节点 1 有4个相邻节点（有边相连），那么节点 1 的度就是 4 。</p>
+<p>即<code>degree=4</code>。</p>
+<p>但是这是一个有向图，就会分成<code>in_degree</code>和 <code>out_degree</code> 两种度。</p>
+<p>那么我们要找到根结点，只需要去找<code>in_degree==0</code>的节点就是根节点，同理<code>out_degree==0</code>的节点为末级节点。</p>
+<p>因此，我们写代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">top_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">in_degree</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;root node:&#39;</span><span class="p">,</span> <span class="n">top_nodes</span><span class="p">)</span></span></span></code></pre></div>
+<p>可以计算出根结点为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[</span><span class="mi">0</span><span class="p">]</span></span></span></code></pre></div>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 4: <!-- raw HTML omitted -->图4</p>
+        </figcaption>
+</figure>
+
+<p>如图 4 所示，我们可以找到图中的根节点，它就是这个网络的头目。</p>
+<h2 id="计算网络层级关系">计算网络层级关系</h2>
+<p>为了计算网络层级关系，这里我们需要引入一个概念*距离*，也就是两个节点之间的最短路径长度。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 5: <!-- raw HTML omitted -->图5</p>
+        </figcaption>
+</figure>
+
+<p>对于节点 1 到节点 4 的距离为 3 ，因为两条路径可以从节点 1 到达节点 3 ：</p>
+<ul>
+<li>[1, 2, 3, 4]</li>
+<li>[1, 2, 5, 4]</li>
+</ul>
+<p>这两条路径最短的距离就是 3 。</p>
+<p>在<code>networkx</code>库中有个函数<code>nx.shortest_path_length(G,source,target)</code>可以求出节点<code>source</code>和 <code>target</code> 之间的距离。</p>
+<p>如果省略<code>target</code>参数，就可以求出<code>source</code>下所有节点与<code>source</code>之间的距离。</p>
+<p>因此，我们只需要用=nx.shortest_path_length(G, 0)=就可以求出=根节点0=下的所有节点的距离，也就是*网络层级*。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">level</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<p><code>level</code> 的值是下面这样的=节点:距离=的字典，可以看到一共 32 个层级。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="mi">2576</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span> <span class="mi">5659</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span></span></span></code></pre></div>
+<p>我们求出了所有子节点到根节点的距离<code>level</code>列表，用<code>set_node_attributes()</code>函数给每个节点添加一个层级属性。</p>
+<p>下面，我们只需要将<code>level</code>列表，统计出 1-32 层级中分别有哪些节点即可。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 显示层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">level</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10层节点</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></span></span></code></pre></div>
+<p>这里我们展示前 10 层级对应的哪些节点：</p>
+<figure>
+</figure>
+
+<p>当然，我们将上面<code>print(l,n)</code>替换成<code>print(l,len(n))</code>，就可以看到每一层级对应的节点数量。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 6: <!-- raw HTML omitted -->图6</p>
+        </figcaption>
+</figure>
+
+<h2 id="下线前10的节点">下线前10的节点</h2>
+<p>我们知道=度=表示了相邻节点数量，那么度值最大的 10 个，也就是下线数最大的 10 个。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">degrees</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">out_degree</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_degree_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">top_degree_nodes</span><span class="p">)</span></span></span></code></pre></div>
+<p>计算结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[(</span><span class="mi">2828</span><span class="p">,</span> <span class="mi">264</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">115</span><span class="p">),</span> <span class="p">(</span><span class="mi">2700</span><span class="p">,</span> <span class="mi">86</span><span class="p">),</span> <span class="p">(</span><span class="mi">2833</span><span class="p">,</span> <span class="mi">65</span><span class="p">),</span> <span class="p">(</span><span class="mi">2999</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mi">2560</span><span class="p">,</span> <span class="mi">53</span><span class="p">),</span> <span class="p">(</span><span class="mi">2574</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="mi">3021</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span> <span class="p">(</span><span class="mi">2651</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span> <span class="p">(</span><span class="mi">2834</span><span class="p">,</span> <span class="mi">31</span><span class="p">)]</span></span></span></code></pre></div>
+<p>可以看到下线最多的节点是<code>节点2828</code>有 264 个下线，第二是<code>根节点0</code>有 115 个下线。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 7: <!-- raw HTML omitted -->图7</p>
+        </figcaption>
+</figure>
+
+<p>这些节点表现在图中就是像水母一样的中心节点。</p>
+<h2 id="最大介绍top10">最大介绍top10</h2>
+<p>除了通过=度=来衡量一个节点是否为关键节点外，我们还可以通过介数来衡量。</p>
+<p>如图 8 所示，根节点 0 传递到节点1,节点2,节点3&hellip;.</p>
+<p>其中节点2,节点 5 的度非常小，分别为 2 和1,但是如果少了他们的话，后面整个网络就断了。</p>
+<p>介数就是表示网络中群体与群体之间的中间人角色，现实生活中如果度数大的是黄牛，那么这个介数的中间人就是给黄牛提供渠道的关键人物。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 8: <!-- raw HTML omitted -->图8</p>
+        </figcaption>
+</figure>
+
+<p>我们在图中将前 10 大中介点标记成了绿色，方便查看。</p>
+<h2 id="完整代码">完整代码</h2>
+<p>以上分析的完整代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyvis.network</span> <span class="kn">import</span> <span class="n">Network</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 读取数据创建图</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;~/传销原始数据.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;推荐人ID&#39;</span><span class="p">,</span> <span class="s1">&#39;被推荐人ID&#39;</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 求根节点</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">in_degree</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;root node:&#39;</span><span class="p">,</span> <span class="n">top_nodes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 节点层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">level</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">level</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10层节点</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10大度节点</span>
+</span></span><span class="line"><span class="cl"><span class="n">degrees</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">out_degree</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_degree_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">top_degree_nodes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 给节点添加属性</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">level</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 给节点添加大小属于</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">-</span> <span class="n">level</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第一、二、三层节点添加颜色</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fuchsia&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 中介点</span>
+</span></span><span class="line"><span class="cl"><span class="n">center</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">center_tops</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 给前10大中介点添加颜色</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">center_tops</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;teal&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">write_gexf</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s1">&#39;test.gexf&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;650px&#39;</span><span class="p">,</span> <span class="s1">&#39;1250px&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">from_nx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s1">&#39;test.html&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<h2 id="结语">结语</h2>
+<p>networkx是复杂网络分析的利器，搭配上可视化库 pyvis ，可以简单几行代码完成分析和可视化。</p>
+]]></description>
+</item>
+</channel>
+</rss>

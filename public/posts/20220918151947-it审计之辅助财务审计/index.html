@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>IT审计之辅助财务审计 - 逆行的狗</title><meta name="Description" content="nigo的个人博客"><meta property="og:title" content="IT审计之辅助财务审计" />
+<meta property="og:description" content="在实践中， IT 审计团队通常是和财务审计团队配合完成审计工作的，区别是财务审计是对被审计单位的财务报表及其附注发表意见，而 IT 审计是对信息系统发表意见。
+我们所做的工作是通过测试财务报表所依赖的信息系统(包括财务系统和业务系统）的有效性、数据的真实性，证明信息系统环境是否可以信赖。从某种意义上来说， IT 审计是服务于财务审计。
+随着财务审计对 IT 审计工作的了解，他们会对 IT 审计提出更多 IT 审计工作范围外的期待。
+尤其是在企业信息化浪潮下，受限于技术能力，财务审计团队在数据处理，方法创新方面对 IT 审计团队提出了更高的要求。因此 IT 审计如何更好地辅助财务审计是一个新的课题。
+利用Python代替繁重计算 在财务审计中存在大量数据处理、数据计算的基础性工作，对于这类有逻辑重复性工作， IT 审计团队可以借助 Python 批量完成。
+成本还原 对于生产制造业的 IPO 审计项目，成产品的料工费占比是财务审计特别关注的事项。而很多企业采用了逐步结转分步法来核算生产成本，由于每一道工序的半成品将是下一道工序的原材料，所以要计算产成品真实的料工费占比就需要进行成本还原。
+如果企业使用的 ERP 系统没有还原后的成本结构报表，同时财务成本会计也未手工编制成本结构报表，那么这项核查工作对于财务审计来说将是巨大的工作量。
+对于这类财审提出的需求，我们会了解企业的生产工艺，以及成本还原的计算方法，再利用 Python 编程语言，模拟成本还原的计算过程，将产成品拆分成真实的料工费，从而计算出料工费的占比。
+通过 IT 审计团队的辅助，财审团队能完成人工短时间无法完成的工作。
+保费收入与收款流水核对 在一家保险公司 IT 审计项目中，财审团队需要我们对保费收入与收款流水进行数据核对。
+当我们了解到业务中存在大量多个保单对应多个收款流水的情况，对于这种多对多关系，正常是无法批量核对的。
+一般情况下，我们核对的数据关系要么是一对一、多对一或者一对多。这三种情况我们写 SQL 语句时都很好处理，只需要将多条数据按单号聚合汇总再进行核对就可以。
+这种多对多的关系我们可以借助数学图论中的二分图解决。
+比如，我们将这种关系画上线，可以看到其中可以形成一些独立的网络，这里我们将这种网络（用不同颜色标记）简称为组。
+我们将独立的网络编上组号，然后将两个数据集的金额分别按组号汇总再进行核对。
+示例 Python 代码：
+class Net(object): def __init__(self): self.setA = { &#39;A&#39;: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;B&#39;: [&#39;d&#39;], &#39;C&#39;: [&#39;b&#39;], &#39;D&#39;: [&#39;a&#39;, &#39;c&#39;], &#39;E&#39;: [&#39;e&#39;] } self." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-09-18T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-02-11T15:34:25+08:00" /><meta property="og:site_name" content="逆行的狗" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="IT审计之辅助财务审计"/>
+<meta name="twitter:description" content="在实践中， IT 审计团队通常是和财务审计团队配合完成审计工作的，区别是财务审计是对被审计单位的财务报表及其附注发表意见，而 IT 审计是对信息系统发表意见。
+我们所做的工作是通过测试财务报表所依赖的信息系统(包括财务系统和业务系统）的有效性、数据的真实性，证明信息系统环境是否可以信赖。从某种意义上来说， IT 审计是服务于财务审计。
+随着财务审计对 IT 审计工作的了解，他们会对 IT 审计提出更多 IT 审计工作范围外的期待。
+尤其是在企业信息化浪潮下，受限于技术能力，财务审计团队在数据处理，方法创新方面对 IT 审计团队提出了更高的要求。因此 IT 审计如何更好地辅助财务审计是一个新的课题。
+利用Python代替繁重计算 在财务审计中存在大量数据处理、数据计算的基础性工作，对于这类有逻辑重复性工作， IT 审计团队可以借助 Python 批量完成。
+成本还原 对于生产制造业的 IPO 审计项目，成产品的料工费占比是财务审计特别关注的事项。而很多企业采用了逐步结转分步法来核算生产成本，由于每一道工序的半成品将是下一道工序的原材料，所以要计算产成品真实的料工费占比就需要进行成本还原。
+如果企业使用的 ERP 系统没有还原后的成本结构报表，同时财务成本会计也未手工编制成本结构报表，那么这项核查工作对于财务审计来说将是巨大的工作量。
+对于这类财审提出的需求，我们会了解企业的生产工艺，以及成本还原的计算方法，再利用 Python 编程语言，模拟成本还原的计算过程，将产成品拆分成真实的料工费，从而计算出料工费的占比。
+通过 IT 审计团队的辅助，财审团队能完成人工短时间无法完成的工作。
+保费收入与收款流水核对 在一家保险公司 IT 审计项目中，财审团队需要我们对保费收入与收款流水进行数据核对。
+当我们了解到业务中存在大量多个保单对应多个收款流水的情况，对于这种多对多关系，正常是无法批量核对的。
+一般情况下，我们核对的数据关系要么是一对一、多对一或者一对多。这三种情况我们写 SQL 语句时都很好处理，只需要将多条数据按单号聚合汇总再进行核对就可以。
+这种多对多的关系我们可以借助数学图论中的二分图解决。
+比如，我们将这种关系画上线，可以看到其中可以形成一些独立的网络，这里我们将这种网络（用不同颜色标记）简称为组。
+我们将独立的网络编上组号，然后将两个数据集的金额分别按组号汇总再进行核对。
+示例 Python 代码：
+class Net(object): def __init__(self): self.setA = { &#39;A&#39;: [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;], &#39;B&#39;: [&#39;d&#39;], &#39;C&#39;: [&#39;b&#39;], &#39;D&#39;: [&#39;a&#39;, &#39;c&#39;], &#39;E&#39;: [&#39;e&#39;] } self."/>
+<meta name="application-name" content="My cool site">
+<meta name="apple-mobile-web-app-title" content="My cool site"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" /><link rel="prev" href="https://nigo81.github.io/posts/20220827231902-%E9%80%90%E6%A2%A6_%E5%A3%B9/" /><link rel="next" href="https://nigo81.github.io/posts/20230205232142-%E8%AE%A9%E4%BA%BA%E4%B8%8A%E7%98%BE%E7%9A%84emacs/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><link rel="preload" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "IT审计之辅助财务审计",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/nigo81.github.io\/posts\/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1\/"
+        },"genre": "posts","keywords": "IT审计, python","wordcount":  288 ,
+        "url": "https:\/\/nigo81.github.io\/posts\/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1\/","datePublished": "2022-09-18T00:00:00+00:00","dateModified": "2023-02-11T15:34:25+08:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "nigo"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="逆行的狗"><span class="header-title-pre">🐶</span>逆行的狗</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="/posts/"> 所有文章 </a><a class="menu-item" href="/tags/"> 标签 </a><a class="menu-item" href="/categories/"> 分类 </a><a class="menu-item" href="/about/"> 关于 </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="逆行的狗"><span class="header-title-pre">🐶</span>逆行的狗</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw" aria-hidden="true"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div><a class="menu-item" href="/posts/" title="">所有文章</a><a class="menu-item" href="/tags/" title="">标签</a><a class="menu-item" href="/categories/" title="">分类</a><a class="menu-item" href="/about/" title="">关于</a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><div class="search-dropdown desktop">
+        <div id="search-dropdown-desktop"></div>
+    </div>
+    <div class="search-dropdown mobile">
+        <div id="search-dropdown-mobile"></div>
+    </div><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">IT审计之辅助财务审计</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="/" title="Author" rel="author" class="author"><i class="fas fa-user-circle fa-fw" aria-hidden="true"></i>nigo</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/%E5%B7%A5%E4%BD%9C/"><i class="far fa-folder fa-fw" aria-hidden="true"></i>工作</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw" aria-hidden="true"></i>&nbsp;<time datetime="2022-09-18">2022-09-18</time>&nbsp;<i class="fas fa-pencil-alt fa-fw" aria-hidden="true"></i>&nbsp;约 288 字&nbsp;
+                <i class="far fa-clock fa-fw" aria-hidden="true"></i>&nbsp;预计阅读 2 分钟&nbsp;</div>
+        </div><div class="details toc" id="toc-static"  data-kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#利用python代替繁重计算">利用Python代替繁重计算</a>
+      <ul>
+        <li><a href="#成本还原">成本还原</a></li>
+        <li><a href="#保费收入与收款流水核对">保费收入与收款流水核对</a></li>
+      </ul>
+    </li>
+    <li><a href="#利用python获取外部信息">利用Python获取外部信息</a></li>
+    <li><a href="#利用it技术进行方法创新">利用IT技术进行方法创新</a></li>
+    <li><a href="#结语">结语</a></li>
+  </ul>
+</nav></div>
+            </div><div class="content" id="content"><p>在实践中， IT 审计团队通常是和财务审计团队配合完成审计工作的，区别是财务审计是对被审计单位的财务报表及其附注发表意见，而 IT 审计是对信息系统发表意见。</p>
+<p>我们所做的工作是通过测试财务报表所依赖的信息系统(包括财务系统和业务系统）的有效性、数据的真实性，证明信息系统环境是否可以信赖。从某种意义上来说， IT 审计是服务于财务审计。</p>
+<p>随着财务审计对 IT 审计工作的了解，他们会对 IT 审计提出更多 IT 审计工作范围外的期待。</p>
+<p>尤其是在企业信息化浪潮下，受限于技术能力，财务审计团队在数据处理，方法创新方面对 IT 审计团队提出了更高的要求。因此 IT 审计如何更好地辅助财务审计是一个新的课题。</p>
+<h2 id="利用python代替繁重计算">利用Python代替繁重计算</h2>
+<p>在财务审计中存在大量数据处理、数据计算的基础性工作，对于这类有逻辑重复性工作， IT 审计团队可以借助 Python 批量完成。</p>
+<h3 id="成本还原">成本还原</h3>
+<p>对于生产制造业的 IPO 审计项目，成产品的料工费占比是财务审计特别关注的事项。而很多企业采用了逐步结转分步法来核算生产成本，由于每一道工序的半成品将是下一道工序的原材料，所以要计算产成品真实的料工费占比就需要进行成本还原。</p>
+<p>如果企业使用的 ERP 系统没有还原后的成本结构报表，同时财务成本会计也未手工编制成本结构报表，那么这项核查工作对于财务审计来说将是巨大的工作量。</p>
+<figure><img src="/ox-hugo/2022-09-18_16-25-01_screenshot.png"/>
+</figure>
+
+<p>对于这类财审提出的需求，我们会了解企业的生产工艺，以及成本还原的计算方法，再利用 Python 编程语言，模拟成本还原的计算过程，将产成品拆分成真实的料工费，从而计算出料工费的占比。</p>
+<p>通过 IT 审计团队的辅助，财审团队能完成人工短时间无法完成的工作。</p>
+<h3 id="保费收入与收款流水核对">保费收入与收款流水核对</h3>
+<p>在一家保险公司 IT 审计项目中，财审团队需要我们对保费收入与收款流水进行数据核对。</p>
+<p>当我们了解到业务中存在大量多个保单对应多个收款流水的情况，对于这种多对多关系，正常是无法批量核对的。</p>
+<figure><img src="/ox-hugo/2022-09-18_16-59-53_screenshot.png"/>
+</figure>
+
+<p>一般情况下，我们核对的数据关系要么是一对一、多对一或者一对多。这三种情况我们写 SQL 语句时都很好处理，只需要将多条数据按单号聚合汇总再进行核对就可以。</p>
+<p>这种多对多的关系我们可以借助数学图论中的二分图解决。</p>
+<p>比如，我们将这种关系画上线，可以看到其中可以形成一些独立的网络，这里我们将这种网络（用不同颜色标记）简称为组。</p>
+<p>我们将独立的网络编上组号，然后将两个数据集的金额分别按组号汇总再进行核对。</p>
+<p>示例 Python 代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">setA</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">setB</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setB</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">split_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">                <span class="bp">self</span><span class="o">.</span><span class="n">loop_net</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">loop_net</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">node</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="nb">id</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sub_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sub_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setB</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">sub_nodes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="n">sub_node</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="n">sub_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                        <span class="bp">self</span><span class="o">.</span><span class="n">loop_net</span><span class="p">(</span><span class="n">sub_node</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">net</span><span class="o">.</span><span class="n">split_net</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span></span></span></code></pre></div>
+<p>我们借助 Python 构建了类<code>Net</code>,通过 <code>loop_net</code>函数递归找出两个数据集形成的独立网络，从而给独立网络分组，最后我们可以将两个数据集分别按组号聚合后进行核对。</p>
+<h2 id="利用python获取外部信息">利用Python获取外部信息</h2>
+<p>在财务审计过程中，外部信息的可靠性大于内部信息，因此审计师会查询大量的外部信息与获取的内部信息做交叉验证。</p>
+<p>例如，审计一家汽车硬件销售的企业，财务审计团队计划查询销售订单中对应的汽车车架号的信息，核实有没有真实车辆以及车型信息，以及判断查询的外部信息与订单信息是否存在矛盾。</p>
+<p>企业 1 年的销售订单有 30 万，依赖审计师人工查询将不太现实。那么，我们 IT 审计团队提出了两种方案：</p>
+<ol>
+<li>购买接口，通过 python 调用接口批量获取数据。</li>
+<li>编写爬虫，通过 python 编写爬虫获取公开网站数据。</li>
+</ol>
+<p>出于节约成本考虑我们选择编写爬虫获取公开信息，用 python 的selenium包，自动查询网站数据，并将结果保存到本地文件。</p>
+<p><a href="https://mpvideo.qpic.cn/0bc35aacyaaa5aacjvv2vfqvb2gdftuaalaa.f10002.mp4?dis_k=78250b45e8ef9c34e7a88d9aabbf2f17&amp;dis_t=1663494076&amp;vid=wxv_2180860661377925123&amp;format_id=10002&amp;support_redirect=0&amp;mmversion=false" target="_blank" rel="noopener noreffer ">视频</a></p>
+<p>最后再由财务审计团队对外部信息与内部信息的一致性进行判断。</p>
+<p>当然，对于很多公开网站都会有反爬措施，如验证码、访问频率限制、字体混淆等，对于我们 IT 审计团队提出了一定的技术要求。</p>
+<p>除此外，财务审计对于外部信息的获取有很大的需求，如同行业财务指标、公司公告、发函快递信息、汇率、交易性金融资产价格等等。</p>
+<p>这类需求，随着这几年的发展已有很多成熟的商业网站可以满足，但对于一些特殊的、行业属性较强的小众信息，如果不能批量查询，那么 IT 审计团队就可以辅助财务审计完成信息获取工作。</p>
+<h2 id="利用it技术进行方法创新">利用IT技术进行方法创新</h2>
+<p>2020年 6 月24日，证监会依法对獐子岛公司信息披露违法违规案作出行政处罚及市场禁入决定。证监会将渔船的北斗定位信息，通过第三方机构还原出航行轨迹，从而计算出采捕区域面积，进而估算真实成本。</p>
+<p>根据这则公开披露的信息，启发了我们利用信息技术的优势，对相关数据进行深入分析挖掘，使审计工作更加智慧、高效。我们 IT 审计团队相对有信息技术的优势，而财务审计团队在财务处理、项目风险识别等方面更有优势，两个团队的良好融合会发挥1+1&gt;2的效果。</p>
+<p>对于这类精纬度空间信息，我们可以通过 Python 计算面积、周长、距离。</p>
+<figure><img src="/ox-hugo/2022-09-18_20-55-02_screenshot.png"/>
+</figure>
+
+<p>示例 Python 代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Geod</span> <span class="c1"># 导入Geod类</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">Polygon</span> <span class="c1"># 导入点、线、多边形类</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算封闭区域面积、周长</span>
+</span></span><span class="line"><span class="cl"><span class="n">geod</span> <span class="o">=</span> <span class="n">Geod</span><span class="p">(</span><span class="n">ellps</span><span class="o">=</span><span class="s2">&#34;WGS84&#34;</span><span class="p">)</span> <span class="c1"># 创建一个WGS84坐标系</span>
+</span></span><span class="line"><span class="cl"><span class="n">polygon</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">([(</span><span class="mf">116.169465</span><span class="p">,</span> <span class="mf">39.932670</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.160260</span><span class="p">,</span> <span class="mf">39.924492</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.150625</span><span class="p">,</span> <span class="mf">39.710019</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.183198</span><span class="p">,</span> <span class="mf">39.709920</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.226950</span><span class="p">,</span> <span class="mf">39.777616</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.442621</span><span class="p">,</span> <span class="mf">39.799892</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.463478</span><span class="p">,</span> <span class="mf">39.790066</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.588276</span><span class="p">,</span> <span class="mf">39.809551</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.536091</span><span class="p">,</span> <span class="mf">39.808859</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.573856</span><span class="p">,</span> <span class="mf">39.839643</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.706380</span><span class="p">,</span> <span class="mf">39.916740</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.600293</span><span class="p">,</span> <span class="mf">39.937770</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.514805</span><span class="p">,</span> <span class="mf">39.982375</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.499935</span><span class="p">,</span> <span class="mf">40.013710</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.546520</span><span class="p">,</span> <span class="mf">40.030443</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.687668</span><span class="p">,</span> <span class="mf">40.129961</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.539697</span><span class="p">,</span> <span class="mf">40.080659</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.503390</span><span class="p">,</span> <span class="mf">40.058474</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.468800</span><span class="p">,</span> <span class="mf">40.052578</span><span class="p">)])</span> <span class="c1"># 将多个精纬度坐标实例化为Polygon多边形对象</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly_area</span><span class="p">,</span> <span class="n">poly_perimeter</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">geometry_area_perimeter</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span> <span class="c1"># 计算多边形面积和周长</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">poly_area</span><span class="p">,</span> <span class="n">poly_perimeter</span><span class="p">)</span> <span class="c1"># 打印面积和周长</span></span></span></code></pre></div>
+<p>面积:951546279.1726327 周长:183419.43445625657</p>
+<h2 id="结语">结语</h2>
+<p>随着新技术、新模式在企业发展过程中不断涌现，财务审计与 IT 审计的融合将会更加紧密。在这样的背景下， IT 审计的工作界限未来可能会更加模糊， IT 审计如何发挥我们的优势辅助财务审计高效、智慧地完成审计工作需要我们共同探索。</p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2023-02-11</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/index.md" target="_blank">阅读原始文档</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" data-title="IT审计之辅助财务审计" data-hashtags="IT审计,python"><i class="fab fa-twitter fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" data-hashtag="IT审计"><i class="fab fa-facebook-square fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" data-title="IT审计之辅助财务审计"><i class="fab fa-hacker-news fa-fw" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" data-title="IT审计之辅助财务审计"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@7.3.0/icons/line.svg" aria-hidden="true"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/" data-title="IT审计之辅助财务审计"><i class="fab fa-weibo fa-fw" aria-hidden="true"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw" aria-hidden="true"></i>&nbsp;<a href="/tags/it%E5%AE%A1%E8%AE%A1/">IT审计</a>,&nbsp;<a href="/tags/python/">python</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/posts/20220827231902-%E9%80%90%E6%A2%A6_%E5%A3%B9/" class="prev" rel="prev" title="逐梦 壹"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>逐梦 壹</a>
+            <a href="/posts/20230205232142-%E8%AE%A9%E4%BA%BA%E4%B8%8A%E7%98%BE%E7%9A%84emacs/" class="next" rel="next" title="让人上瘾的emacs">让人上瘾的emacs<i class="fas fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.110.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.11"><i class="far fa-kiss-wink-heart fa-fw" aria-hidden="true"></i> LoveIt</a>
+                </div><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">nigo</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.38.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.13.1/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.5.1/sharer.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":50},"comment":{},"search":{"algoliaAppID":"L2PH9BYQ9X","algoliaIndex":"nigo81.gitee.io","algoliaSearchKey":"19987eb6158ae8873649ad30bbb5cea5","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":30,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script></body>
+</html>

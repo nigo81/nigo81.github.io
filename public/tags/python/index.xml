@@ -1,0 +1,595 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>python - 标签 - 逆行的狗</title>
+        <link>https://nigo81.github.io/tags/python/</link>
+        <description>python - 标签 - 逆行的狗</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>tujiabing81@163.com (nigo)</managingEditor>
+            <webMaster>tujiabing81@163.com (nigo)</webMaster><lastBuildDate>Sun, 18 Sep 2022 00:00:00 &#43;0000</lastBuildDate><atom:link href="https://nigo81.github.io/tags/python/" rel="self" type="application/rss+xml" /><item>
+    <title>IT审计之辅助财务审计</title>
+    <link>https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/</link>
+    <pubDate>Sun, 18 Sep 2022 00:00:00 &#43;0000</pubDate>
+    <author>nigo</author>
+    <guid>https://nigo81.github.io/posts/20220918151947-it%E5%AE%A1%E8%AE%A1%E4%B9%8B%E8%BE%85%E5%8A%A9%E8%B4%A2%E5%8A%A1%E5%AE%A1%E8%AE%A1/</guid>
+    <description><![CDATA[<p>在实践中， IT 审计团队通常是和财务审计团队配合完成审计工作的，区别是财务审计是对被审计单位的财务报表及其附注发表意见，而 IT 审计是对信息系统发表意见。</p>
+<p>我们所做的工作是通过测试财务报表所依赖的信息系统(包括财务系统和业务系统）的有效性、数据的真实性，证明信息系统环境是否可以信赖。从某种意义上来说， IT 审计是服务于财务审计。</p>
+<p>随着财务审计对 IT 审计工作的了解，他们会对 IT 审计提出更多 IT 审计工作范围外的期待。</p>
+<p>尤其是在企业信息化浪潮下，受限于技术能力，财务审计团队在数据处理，方法创新方面对 IT 审计团队提出了更高的要求。因此 IT 审计如何更好地辅助财务审计是一个新的课题。</p>
+<h2 id="利用python代替繁重计算">利用Python代替繁重计算</h2>
+<p>在财务审计中存在大量数据处理、数据计算的基础性工作，对于这类有逻辑重复性工作， IT 审计团队可以借助 Python 批量完成。</p>
+<h3 id="成本还原">成本还原</h3>
+<p>对于生产制造业的 IPO 审计项目，成产品的料工费占比是财务审计特别关注的事项。而很多企业采用了逐步结转分步法来核算生产成本，由于每一道工序的半成品将是下一道工序的原材料，所以要计算产成品真实的料工费占比就需要进行成本还原。</p>
+<p>如果企业使用的 ERP 系统没有还原后的成本结构报表，同时财务成本会计也未手工编制成本结构报表，那么这项核查工作对于财务审计来说将是巨大的工作量。</p>
+<figure>
+</figure>
+
+<p>对于这类财审提出的需求，我们会了解企业的生产工艺，以及成本还原的计算方法，再利用 Python 编程语言，模拟成本还原的计算过程，将产成品拆分成真实的料工费，从而计算出料工费的占比。</p>
+<p>通过 IT 审计团队的辅助，财审团队能完成人工短时间无法完成的工作。</p>
+<h3 id="保费收入与收款流水核对">保费收入与收款流水核对</h3>
+<p>在一家保险公司 IT 审计项目中，财审团队需要我们对保费收入与收款流水进行数据核对。</p>
+<p>当我们了解到业务中存在大量多个保单对应多个收款流水的情况，对于这种多对多关系，正常是无法批量核对的。</p>
+<figure>
+</figure>
+
+<p>一般情况下，我们核对的数据关系要么是一对一、多对一或者一对多。这三种情况我们写 SQL 语句时都很好处理，只需要将多条数据按单号聚合汇总再进行核对就可以。</p>
+<p>这种多对多的关系我们可以借助数学图论中的二分图解决。</p>
+<p>比如，我们将这种关系画上线，可以看到其中可以形成一些独立的网络，这里我们将这种网络（用不同颜色标记）简称为组。</p>
+<p>我们将独立的网络编上组号，然后将两个数据集的金额分别按组号汇总再进行核对。</p>
+<p>示例 Python 代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">setA</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;e&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">setB</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">            <span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setB</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">split_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">                <span class="bp">self</span><span class="o">.</span><span class="n">loop_net</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">loop_net</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">node</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="nb">id</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sub_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setA</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">sub_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setB</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="n">sub_node</span> <span class="ow">in</span> <span class="n">sub_nodes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="n">sub_node</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">if</span> <span class="n">sub_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">                        <span class="bp">self</span><span class="o">.</span><span class="n">loop_net</span><span class="p">(</span><span class="n">sub_node</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">net</span><span class="o">.</span><span class="n">split_net</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="nb">print</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span></span></span></code></pre></div>
+<p>我们借助 Python 构建了类<code>Net</code>,通过 <code>loop_net</code>函数递归找出两个数据集形成的独立网络，从而给独立网络分组，最后我们可以将两个数据集分别按组号聚合后进行核对。</p>
+<h2 id="利用python获取外部信息">利用Python获取外部信息</h2>
+<p>在财务审计过程中，外部信息的可靠性大于内部信息，因此审计师会查询大量的外部信息与获取的内部信息做交叉验证。</p>
+<p>例如，审计一家汽车硬件销售的企业，财务审计团队计划查询销售订单中对应的汽车车架号的信息，核实有没有真实车辆以及车型信息，以及判断查询的外部信息与订单信息是否存在矛盾。</p>
+<p>企业 1 年的销售订单有 30 万，依赖审计师人工查询将不太现实。那么，我们 IT 审计团队提出了两种方案：</p>
+<ol>
+<li>购买接口，通过 python 调用接口批量获取数据。</li>
+<li>编写爬虫，通过 python 编写爬虫获取公开网站数据。</li>
+</ol>
+<p>出于节约成本考虑我们选择编写爬虫获取公开信息，用 python 的selenium包，自动查询网站数据，并将结果保存到本地文件。</p>
+<p><a href="https://mpvideo.qpic.cn/0bc35aacyaaa5aacjvv2vfqvb2gdftuaalaa.f10002.mp4?dis_k=78250b45e8ef9c34e7a88d9aabbf2f17&amp;dis_t=1663494076&amp;vid=wxv_2180860661377925123&amp;format_id=10002&amp;support_redirect=0&amp;mmversion=false" target="_blank" rel="noopener noreffer ">视频</a></p>
+<p>最后再由财务审计团队对外部信息与内部信息的一致性进行判断。</p>
+<p>当然，对于很多公开网站都会有反爬措施，如验证码、访问频率限制、字体混淆等，对于我们 IT 审计团队提出了一定的技术要求。</p>
+<p>除此外，财务审计对于外部信息的获取有很大的需求，如同行业财务指标、公司公告、发函快递信息、汇率、交易性金融资产价格等等。</p>
+<p>这类需求，随着这几年的发展已有很多成熟的商业网站可以满足，但对于一些特殊的、行业属性较强的小众信息，如果不能批量查询，那么 IT 审计团队就可以辅助财务审计完成信息获取工作。</p>
+<h2 id="利用it技术进行方法创新">利用IT技术进行方法创新</h2>
+<p>2020年 6 月24日，证监会依法对獐子岛公司信息披露违法违规案作出行政处罚及市场禁入决定。证监会将渔船的北斗定位信息，通过第三方机构还原出航行轨迹，从而计算出采捕区域面积，进而估算真实成本。</p>
+<p>根据这则公开披露的信息，启发了我们利用信息技术的优势，对相关数据进行深入分析挖掘，使审计工作更加智慧、高效。我们 IT 审计团队相对有信息技术的优势，而财务审计团队在财务处理、项目风险识别等方面更有优势，两个团队的良好融合会发挥1+1&gt;2的效果。</p>
+<p>对于这类精纬度空间信息，我们可以通过 Python 计算面积、周长、距离。</p>
+<figure>
+</figure>
+
+<p>示例 Python 代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Geod</span> <span class="c1"># 导入Geod类</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">Polygon</span> <span class="c1"># 导入点、线、多边形类</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 计算封闭区域面积、周长</span>
+</span></span><span class="line"><span class="cl"><span class="n">geod</span> <span class="o">=</span> <span class="n">Geod</span><span class="p">(</span><span class="n">ellps</span><span class="o">=</span><span class="s2">&#34;WGS84&#34;</span><span class="p">)</span> <span class="c1"># 创建一个WGS84坐标系</span>
+</span></span><span class="line"><span class="cl"><span class="n">polygon</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">([(</span><span class="mf">116.169465</span><span class="p">,</span> <span class="mf">39.932670</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.160260</span><span class="p">,</span> <span class="mf">39.924492</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.150625</span><span class="p">,</span> <span class="mf">39.710019</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.183198</span><span class="p">,</span> <span class="mf">39.709920</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.226950</span><span class="p">,</span> <span class="mf">39.777616</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.442621</span><span class="p">,</span> <span class="mf">39.799892</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.463478</span><span class="p">,</span> <span class="mf">39.790066</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.588276</span><span class="p">,</span> <span class="mf">39.809551</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.536091</span><span class="p">,</span> <span class="mf">39.808859</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.573856</span><span class="p">,</span> <span class="mf">39.839643</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.706380</span><span class="p">,</span> <span class="mf">39.916740</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.600293</span><span class="p">,</span> <span class="mf">39.937770</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.514805</span><span class="p">,</span> <span class="mf">39.982375</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.499935</span><span class="p">,</span> <span class="mf">40.013710</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.546520</span><span class="p">,</span> <span class="mf">40.030443</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.687668</span><span class="p">,</span> <span class="mf">40.129961</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.539697</span><span class="p">,</span> <span class="mf">40.080659</span><span class="p">),</span> <span class="p">(</span><span class="mf">116.503390</span><span class="p">,</span> <span class="mf">40.058474</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="p">(</span><span class="mf">116.468800</span><span class="p">,</span> <span class="mf">40.052578</span><span class="p">)])</span> <span class="c1"># 将多个精纬度坐标实例化为Polygon多边形对象</span>
+</span></span><span class="line"><span class="cl"><span class="n">poly_area</span><span class="p">,</span> <span class="n">poly_perimeter</span> <span class="o">=</span> <span class="n">geod</span><span class="o">.</span><span class="n">geometry_area_perimeter</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span> <span class="c1"># 计算多边形面积和周长</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">poly_area</span><span class="p">,</span> <span class="n">poly_perimeter</span><span class="p">)</span> <span class="c1"># 打印面积和周长</span></span></span></code></pre></div>
+<p>面积:951546279.1726327 周长:183419.43445625657</p>
+<h2 id="结语">结语</h2>
+<p>随着新技术、新模式在企业发展过程中不断涌现，财务审计与 IT 审计的融合将会更加紧密。在这样的背景下， IT 审计的工作界限未来可能会更加模糊， IT 审计如何发挥我们的优势辅助财务审计高效、智慧地完成审计工作需要我们共同探索。</p>
+]]></description>
+</item>
+<item>
+    <title>传销组织层级结构分析</title>
+    <link>https://nigo81.github.io/posts/20220814001303-%E4%BC%A0%E9%94%80%E7%BB%84%E7%BB%87%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/</link>
+    <pubDate>Sun, 14 Aug 2022 00:00:00 &#43;0000</pubDate>
+    <author>nigo</author>
+    <guid>https://nigo81.github.io/posts/20220814001303-%E4%BC%A0%E9%94%80%E7%BB%84%E7%BB%87%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84%E5%88%86%E6%9E%90/</guid>
+    <description><![CDATA[<p>前几天一个网友发了一个传销组织的数据，他想求每个层级的人数。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 1: <!-- raw HTML omitted -->图1</p>
+        </figcaption>
+</figure>
+
+<p>这两天正好学了<code>networkx</code>，我们来看如果用网络分析解决这个问题。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 2: <!-- raw HTML omitted -->图2</p>
+        </figcaption>
+</figure>
+
+<p>这是整个推荐关系的可视化网络图。其中正红色的点为根节点。</p>
+<p>下面我们一步一步来解决。</p>
+<h2 id="读取数据并创建网络">读取数据并创建网络</h2>
+<p>我们使用<code>pandas</code>读取 excel 数据，并用<code>nx.from_pandas_edgelist(df,source,target,edge_attr,create_using)</code>函数来创建一个图=G=。</p>
+<p>这个函数是根据边数据来创建图，其中：</p>
+<ul>
+<li>source:df中表示边起始的列名（推荐人）。</li>
+<li>target:df中表示边目标的列名（被推荐人）。</li>
+<li>edge\_attr:df中表示边属性的列名（如权重，颜色，大小等）。</li>
+<li>create\_using:表示创建什么类型的图，无向图，有向图等。这里我们使用有向图=DiGraph=,因为推荐关系是有方向的。</li>
+</ul>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 读取数据创建图</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;~/传销原始数据.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;推荐人ID&#39;</span><span class="p">,</span> <span class="s1">&#39;被推荐人ID&#39;</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">())</span></span></span></code></pre></div>
+<p>当然这样创建的图=G=只是一个类的实例化，并不一张真正可视化的图。如果你想可视化它，可以使用=pyvis=包进行，它可以生成一个可交互的网络图。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyvis.network</span> <span class="kn">import</span> <span class="n">Network</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;650px&#39;</span><span class="p">,</span> <span class="s1">&#39;1250px&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">from_nx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s1">&#39;test.html&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<p>这将会生成如图 2 所示的网络图。</p>
+<h2 id="找到根节点">找到根节点</h2>
+<p>考虑到这个网络是一个传销组织，那么正常情况下应该是有个唯一的根节点，整个组织类似树状结构。</p>
+<p>我们先得找到这个根节点，怎么找呢？</p>
+<p>这就需要先引一个图论中的概念<strong>度</strong>，度的意思就是一个节点的相邻节点的数量。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 3: <!-- raw HTML omitted -->图3</p>
+        </figcaption>
+</figure>
+
+<p>如图 3 所示，如果不考虑边的方向，那点节点 1 有4个相邻节点（有边相连），那么节点 1 的度就是 4 。</p>
+<p>即<code>degree=4</code>。</p>
+<p>但是这是一个有向图，就会分成<code>in_degree</code>和 <code>out_degree</code> 两种度。</p>
+<p>那么我们要找到根结点，只需要去找<code>in_degree==0</code>的节点就是根节点，同理<code>out_degree==0</code>的节点为末级节点。</p>
+<p>因此，我们写代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">top_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">in_degree</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;root node:&#39;</span><span class="p">,</span> <span class="n">top_nodes</span><span class="p">)</span></span></span></code></pre></div>
+<p>可以计算出根结点为：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[</span><span class="mi">0</span><span class="p">]</span></span></span></code></pre></div>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 4: <!-- raw HTML omitted -->图4</p>
+        </figcaption>
+</figure>
+
+<p>如图 4 所示，我们可以找到图中的根节点，它就是这个网络的头目。</p>
+<h2 id="计算网络层级关系">计算网络层级关系</h2>
+<p>为了计算网络层级关系，这里我们需要引入一个概念*距离*，也就是两个节点之间的最短路径长度。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 5: <!-- raw HTML omitted -->图5</p>
+        </figcaption>
+</figure>
+
+<p>对于节点 1 到节点 4 的距离为 3 ，因为两条路径可以从节点 1 到达节点 3 ：</p>
+<ul>
+<li>[1, 2, 3, 4]</li>
+<li>[1, 2, 5, 4]</li>
+</ul>
+<p>这两条路径最短的距离就是 3 。</p>
+<p>在<code>networkx</code>库中有个函数<code>nx.shortest_path_length(G,source,target)</code>可以求出节点<code>source</code>和 <code>target</code> 之间的距离。</p>
+<p>如果省略<code>target</code>参数，就可以求出<code>source</code>下所有节点与<code>source</code>之间的距离。</p>
+<p>因此，我们只需要用=nx.shortest_path_length(G, 0)=就可以求出=根节点0=下的所有节点的距离，也就是*网络层级*。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">level</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<p><code>level</code> 的值是下面这样的=节点:距离=的字典，可以看到一共 32 个层级。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="mi">2576</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="o">...</span><span class="p">,</span> <span class="mi">5659</span><span class="p">:</span> <span class="mi">32</span><span class="p">}</span></span></span></code></pre></div>
+<p>我们求出了所有子节点到根节点的距离<code>level</code>列表，用<code>set_node_attributes()</code>函数给每个节点添加一个层级属性。</p>
+<p>下面，我们只需要将<code>level</code>列表，统计出 1-32 层级中分别有哪些节点即可。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 显示层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">level</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10层节点</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></span></span></code></pre></div>
+<p>这里我们展示前 10 层级对应的哪些节点：</p>
+<figure>
+</figure>
+
+<p>当然，我们将上面<code>print(l,n)</code>替换成<code>print(l,len(n))</code>，就可以看到每一层级对应的节点数量。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 6: <!-- raw HTML omitted -->图6</p>
+        </figcaption>
+</figure>
+
+<h2 id="下线前10的节点">下线前10的节点</h2>
+<p>我们知道=度=表示了相邻节点数量，那么度值最大的 10 个，也就是下线数最大的 10 个。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">degrees</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">out_degree</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_degree_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">top_degree_nodes</span><span class="p">)</span></span></span></code></pre></div>
+<p>计算结果：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="p">[(</span><span class="mi">2828</span><span class="p">,</span> <span class="mi">264</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">115</span><span class="p">),</span> <span class="p">(</span><span class="mi">2700</span><span class="p">,</span> <span class="mi">86</span><span class="p">),</span> <span class="p">(</span><span class="mi">2833</span><span class="p">,</span> <span class="mi">65</span><span class="p">),</span> <span class="p">(</span><span class="mi">2999</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mi">2560</span><span class="p">,</span> <span class="mi">53</span><span class="p">),</span> <span class="p">(</span><span class="mi">2574</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="mi">3021</span><span class="p">,</span> <span class="mi">37</span><span class="p">),</span> <span class="p">(</span><span class="mi">2651</span><span class="p">,</span> <span class="mi">36</span><span class="p">),</span> <span class="p">(</span><span class="mi">2834</span><span class="p">,</span> <span class="mi">31</span><span class="p">)]</span></span></span></code></pre></div>
+<p>可以看到下线最多的节点是<code>节点2828</code>有 264 个下线，第二是<code>根节点0</code>有 115 个下线。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 7: <!-- raw HTML omitted -->图7</p>
+        </figcaption>
+</figure>
+
+<p>这些节点表现在图中就是像水母一样的中心节点。</p>
+<h2 id="最大介绍top10">最大介绍top10</h2>
+<p>除了通过=度=来衡量一个节点是否为关键节点外，我们还可以通过介数来衡量。</p>
+<p>如图 8 所示，根节点 0 传递到节点1,节点2,节点3&hellip;.</p>
+<p>其中节点2,节点 5 的度非常小，分别为 2 和1,但是如果少了他们的话，后面整个网络就断了。</p>
+<p>介数就是表示网络中群体与群体之间的中间人角色，现实生活中如果度数大的是黄牛，那么这个介数的中间人就是给黄牛提供渠道的关键人物。</p>
+<figure><figcaption>
+            <p><!-- raw HTML omitted -->Figure 8: <!-- raw HTML omitted -->图8</p>
+        </figcaption>
+</figure>
+
+<p>我们在图中将前 10 大中介点标记成了绿色，方便查看。</p>
+<h2 id="完整代码">完整代码</h2>
+<p>以上分析的完整代码：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">pyvis.network</span> <span class="kn">import</span> <span class="n">Network</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 读取数据创建图</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="s1">&#39;~/传销原始数据.xlsx&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;推荐人ID&#39;</span><span class="p">,</span> <span class="s1">&#39;被推荐人ID&#39;</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">from_pandas_edgelist</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="n">create_using</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 求根节点</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">in_degree</span><span class="p">()</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;root node:&#39;</span><span class="p">,</span> <span class="n">top_nodes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 节点层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">level</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">shortest_path_length</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 显示层级</span>
+</span></span><span class="line"><span class="cl"><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">level</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="n">nodes</span>
+</span></span><span class="line"><span class="cl">    <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">data</span><span class="p">[</span><span class="n">l</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10层节点</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">l</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 打印前10大度节点</span>
+</span></span><span class="line"><span class="cl"><span class="n">degrees</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">out_degree</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">top_degree_nodes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">top_degree_nodes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 给节点添加属性</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">level</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 给节点添加大小属于</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span> <span class="o">-</span> <span class="n">level</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 第一、二、三层节点添加颜色</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;fuchsia&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">level</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;purple&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 中介点</span>
+</span></span><span class="line"><span class="cl"><span class="n">center</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">center_tops</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 给前10大中介点添加颜色</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">center_tops</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;teal&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">nx</span><span class="o">.</span><span class="n">write_gexf</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="s1">&#39;test.gexf&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="s1">&#39;650px&#39;</span><span class="p">,</span> <span class="s1">&#39;1250px&#39;</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">from_nx</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">nt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="s1">&#39;test.html&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<h2 id="结语">结语</h2>
+<p>networkx是复杂网络分析的利器，搭配上可视化库 pyvis ，可以简单几行代码完成分析和可视化。</p>
+]]></description>
+</item>
+<item>
+    <title>批量改变文件最后修改时间</title>
+    <link>https://nigo81.github.io/posts/20220814214636-%E6%89%B9%E9%87%8F%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E6%97%B6%E9%97%B4/</link>
+    <pubDate>Sun, 14 Aug 2022 00:00:00 &#43;0000</pubDate>
+    <author>nigo</author>
+    <guid>https://nigo81.github.io/posts/20220814214636-%E6%89%B9%E9%87%8F%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E6%97%B6%E9%97%B4/</guid>
+    <description><![CDATA[<p>有网友问，怎么批量修改文件最后的修改日期。</p>
+<p>比如， excel 文件、 word 文件等。</p>
+<p>当然我们先将电脑日期设置成以前的某个日期，然后一个一个打开文件后，修改下，再保存。这样可以完成日期的更换。</p>
+<p>今天我们用 python 来实现文件修改日期的批量替换。</p>
+<figure>
+</figure>
+
+<p>比如在=/home/nigo/tmp/test=文件夹下有一些文件，最后修改日期是=2022-07-19=。</p>
+<p>我们只需要做两步：</p>
+<ol>
+<li>循环获取该文件夹所有文件路径。</li>
+<li>修改文件日期</li>
+</ol>
+<p>我们先看修改文件日期：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">change_file_date</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">atime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;改变文件修改日期和访问日期&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">info</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">(</span><span class="n">atime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">))</span></span></span></code></pre></div>
+<p>我们只需要用<code>os.utime</code>函数就可以将文件的访问日期和修改日期分别改变为<code>atime</code>和 <code>mtime</code> （时间戳数字）。</p>
+<p>完整代码如下：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">datetime</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">change_file_date</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">atime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;改变文件修改日期和访问日期&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">info</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">(</span><span class="n">atime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_file_list</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span class="n">file_list</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;递归获取文件夹下所有的文件路径&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">newdir</span> <span class="o">=</span> <span class="nb">dir</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="nb">dir</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">#如果需要忽略某些文件夹，使用以下代码</span>
+</span></span><span class="line"><span class="cl">            <span class="c1"># if s == &#34;xxx&#34;:</span>
+</span></span><span class="line"><span class="cl">                <span class="c1"># continue</span>
+</span></span><span class="line"><span class="cl">            <span class="n">newdir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">dir</span><span class="p">,</span><span class="n">s</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">get_file_list</span><span class="p">(</span><span class="n">newdir</span><span class="p">,</span> <span class="n">file_list</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">file_list</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&#34;__main__&#34;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 需要修改的文件所在的文件夹</span>
+</span></span><span class="line"><span class="cl">    <span class="n">modify_directory</span> <span class="o">=</span> <span class="s1">&#39;/home/nigo/tmp/test&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 需要设置成的修改时间：年,月,日,时,分,秒</span>
+</span></span><span class="line"><span class="cl">    <span class="n">modify_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2022</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 将时期转化为时间戳</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">timestamp</span><span class="p">(</span><span class="n">modify_time</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 获取指定文件夹下的所有文件路径</span>
+</span></span><span class="line"><span class="cl">    <span class="n">paths</span> <span class="o">=</span> <span class="n">get_file_list</span><span class="p">(</span><span class="n">modify_directory</span><span class="p">,</span> <span class="p">[])</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 循环所有文件</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 修改文件的访问时间和修改时间</span>
+</span></span><span class="line"><span class="cl">        <span class="n">change_file_date</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">)</span></span></span></code></pre></div>
+<p>我们执行代码将<code>/home/nigo/tmp/test</code>文件夹下的所有文件修改日期改变为<code>2022-04-05 18:20:31</code>。</p>
+<figure>
+</figure>
+
+<p>可以看到所有文件的修改日期已全部批量修改。</p>
+<p>当然你会 VBA 的话，也可以使用 VBA 实现，只是用 Python 更快速一点。</p>
+]]></description>
+</item>
+<item>
+    <title>上交所警示函批量下载</title>
+    <link>https://nigo81.github.io/posts/20220814220542-%E4%B8%8A%E4%BA%A4%E6%89%80%E8%AD%A6%E7%A4%BA%E5%87%BD%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD/</link>
+    <pubDate>Sun, 14 Aug 2022 00:00:00 &#43;0000</pubDate>
+    <author>nigo</author>
+    <guid>https://nigo81.github.io/posts/20220814220542-%E4%B8%8A%E4%BA%A4%E6%89%80%E8%AD%A6%E7%A4%BA%E5%87%BD%E6%89%B9%E9%87%8F%E4%B8%8B%E8%BD%BD/</guid>
+    <description><![CDATA[<blockquote>
+<p>陈版主答疑文章使用的爬虫失效了，暂时没有更新，这周我抽时间更新下，再为大家每天推送。</p>
+</blockquote>
+<p>昨天文章有朋友留言让分享下上交所警示函下载的工具，</p>
+<p>虽然写这个代码不难，但还是可以和大家分享下思路。</p>
+<figure>
+</figure>
+
+<h2 id="任务拆解">任务拆解</h2>
+<p>当我们想做一个工具的时候，首先需要梳理出<strong>逻辑</strong>。</p>
+<p>也就是先手工操作一遍，把一个大任务拆分成可执行的小任务。</p>
+<h3 id="大目标">大目标</h3>
+<p>比如，我们的目标是登录上交所网站，输入“警示函”关键字，点击查询，</p>
+<p>点击一个列表页，将显示的 PDF 下载下来，然后复制其中的文字到我们保存的文件中。</p>
+<p>这个流程有好几步，很多人刚开始学习的时候不太意识到这是一个大目标，</p>
+<p>你直接对别人说：“哎，把最近几年上交所警示函内容帮我整理出来。”</p>
+<p>别人是茫然的，不知道怎么做。</p>
+<p>同样的，你自己也不知道，你可能只能在浏览器上搜索：“批量下载上交所警示函”</p>
+<p>如果运气好，别人做过，可能会有现成的轮子，否则，你就又卡住了。</p>
+<p>要知道，对于一个大目标我们是很难实际落地执行的。</p>
+<h3 id="小任务">小任务</h3>
+<p>那么,要想实现我们的大目标，最好的方法就是任务拆解。</p>
+<ol>
+<li>获取网页信息（包括 PDF 下载链接)</li>
+<li>下载 PDF 文件</li>
+<li>解析 PDF 文件</li>
+<li>保存数据</li>
+</ol>
+<p>当我们能把任务进行拆解后，难度就自然极度下降了，</p>
+<p>我们现在只需要针对这 4 个问题写函数完成。</p>
+<p>我们以最简单的解析 PDF 文件为例，</p>
+<p>啊？为什么这个是最简单的？因为之前在一篇文章中学过，用 <code>pdfplumber</code>
+库解析 PDF 。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pdfplumber</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">extract_pdf</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;提取pdf文字内容&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="n">pdfplumber</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pages</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">pages</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">extract_text</span><span class="p">()</span> <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">text</span></span></span></code></pre></div>
+<p>你看 4 个问题，我们就解决了一个。简单吧？</p>
+<h3 id="周而复始">周而复始</h3>
+<p>需要注意的是，上交所给的 PDF 绝大部分是文本的，一小部分的是扫描图片的。</p>
+<p>这个代码只能解析文本的 PDF ，如果你想完全解决，那么我们又可以任务拆解的方法，</p>
+<p>将<code>3.解析PDF</code>文件分解为：</p>
+<p>3.1 解析文字类PDF</p>
+<p>3.2 解析扫描类PDF</p>
+<p>啊？扫描类的 PDF 文件我怎么解析呢？要么你在浏览器上搜索下有没有这个解决办法。</p>
+<p>要么我们再进一步拆解，我们可以把扫描的 PDF 保存为一张张图片,再用 OCR 去识别图片：</p>
+<p>3.2.1 PDF拆分成图片</p>
+<p>3.2.2 OCR识别图片为文字</p>
+<p>每一个如果不会，就去搜索解决，搜索没有直接答案的，就看能不能拆成更小的任务，</p>
+<p>循环往复，直到找到解决问题的方法。</p>
+<h2 id="搜索问题及笔记记录">搜索问题及笔记记录</h2>
+<p>通过上面的步骤，我们能把一个复杂任务转换为简单任务。</p>
+<p>这也是数学中的化归思想。</p>
+<p>这些简单任务，有些我们可能已经会了，有些可能不会。</p>
+<p>对于不会的，我们就需要去<code>检索</code>了，也就是问 <strong>度娘。</strong></p>
+<p>这个真就是熟能生巧了，查得多了，就有技巧了，基本小的问题你都能解决。</p>
+<p>当你查到后，一定要把<code>有价值</code>的问题，记录到你的笔记中，</p>
+<p>你看上次我们在“ python 提取关键审计事项”的文章中用到的<code>pdfplumber</code>，</p>
+<p>今天又用上了。</p>
+<p>查一次你可能会忘记，当你记录下来，下次遇到你就节约了检索的时间，</p>
+<p>多遇到几次，你就彻底掌握了，这个就是知识习得的过程。</p>
+<h2 id="完整代码">完整代码</h2>
+<p>其实代码并不重要，有需要的可以自己拿来练习、练习。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pdfplumber</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">requests</span>
+</span></span><span class="line"><span class="cl"><span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span><span class="p">,</span><span class="n">urlencode</span><span class="p">,</span><span class="n">quote</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">os</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pymysql</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">ttime</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">extract_pdf</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;提取pdf文字内容&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">with</span> <span class="n">pdfplumber</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pages</span> <span class="o">=</span> <span class="n">pdf</span><span class="o">.</span><span class="n">pages</span>
+</span></span><span class="line"><span class="cl">        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">extract_text</span><span class="p">()</span> <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pages</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">text</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">download_pdf</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">path</span><span class="p">,</span><span class="n">pdf_name</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;下载PDF文件&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">pdf_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">r</span><span class="o">=</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_download_urls</span><span class="p">(</span><span class="n">keyword</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;获取列表信息及PDF下载链接&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://query.sse.com.cn/search/getSearchResult.do?search=qwjs&amp;jsonCallBack=&amp;searchword=T_L+CTITLE+T_E+T_L&#39;</span> <span class="o">+</span> <span class="n">quote</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;+T_R+and+cchannelcode+T_E+T_L0T_D8311T_D8321T_D8348T_D8349T_D8365T_D8703T_D8828T_D8834T_D9856T_D9860T_D9862T_D9888T_D9889T_D9892T_D10004T_D10011T_D10743T_D12002T_D88888888T_RT_R&amp;orderby=-CRELEASETIME&amp;page=</span><span class="si">%s</span><span class="s1">&amp;perpage=10&amp;_=1660204739688&#39;</span> <span class="o">%</span> <span class="n">page</span>
+</span></span><span class="line"><span class="cl">    <span class="n">header</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span><span class="s1">&#39;Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.71&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;Host&#39;</span><span class="p">:</span><span class="s1">&#39;query.sse.com.cn&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s1">&#39;Referer&#39;</span><span class="p">:</span><span class="s1">&#39;http://www.sse.com.cn/&#39;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">json_str</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="n">total_page</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">json_str</span><span class="p">[</span><span class="s1">&#39;countPage&#39;</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">infos</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_page</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">ttime</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="c1"># 暂停的秒数，避免频繁调用</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;获取第</span><span class="si">%s</span><span class="s1">页信息，共</span><span class="si">%s</span><span class="s1">页&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">page</span><span class="p">,</span><span class="n">total_page</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://query.sse.com.cn/search/getSearchResult.do?search=qwjs&amp;jsonCallBack=&amp;searchword=T_L+CTITLE+T_E+T_L&#39;</span> <span class="o">+</span> <span class="n">quote</span><span class="p">(</span><span class="n">keyword</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;+T_R+and+cchannelcode+T_E+T_L0T_D8311T_D8321T_D8348T_D8349T_D8365T_D8703T_D8828T_D8834T_D9856T_D9860T_D9862T_D9888T_D9889T_D9892T_D10004T_D10011T_D10743T_D12002T_D88888888T_RT_R&amp;orderby=-CRELEASETIME&amp;page=</span><span class="si">%s</span><span class="s1">&amp;perpage=10&amp;_=1660204739688&#39;</span> <span class="o">%</span> <span class="n">page</span>
+</span></span><span class="line"><span class="cl">        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">headers</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">json_str</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">json_str</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">title</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CTITLE_TXT&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">link</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CURL&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="s2">&#34;http://www.sse.com.cn/&#34;</span><span class="p">,</span><span class="n">link</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">date</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CRELEASETIME&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">time</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;CRELEASETIME2&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">file_type</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;MIMETYPE&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;DOCID&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="n">title</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;url&#39;</span><span class="p">:</span><span class="n">url</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;date&#39;</span><span class="p">:</span><span class="n">date</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;time&#39;</span><span class="p">:</span><span class="n">time</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;file_type&#39;</span><span class="p">:</span><span class="n">file_type</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                <span class="s1">&#39;id&#39;</span><span class="p">:</span><span class="nb">id</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">infos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">infos</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">upload_mysql</span><span class="p">(</span><span class="n">connect</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">table_name</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="s2">&#34;&#34;&#34;上传字典数据到mysql数据库&#34;&#34;&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">keys</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">    <span class="n">values</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sql</span> <span class="o">=</span> <span class="s1">&#39;insert into </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">) values(</span><span class="si">%s</span><span class="s1">)  on duplicate key update &#39;</span> <span class="o">%</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">table_name</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">update</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sql</span> <span class="o">+=</span> <span class="n">update</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">connect</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">connect</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 使用数据库，如果不将解析的数据传到数据库，可以注释掉,注意修改数据库账号、密码信息</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># connect = pymysql.connect(</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#     host = &#39;127.0.0.1&#39;, db = &#39;book&#39;, user = &#39;root&#39;,</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">#     passwd = &#39;xxxx&#39;, charset = &#39;utf8&#39;)</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># cursor = connect.cursor()</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># table_name = &#39;chufa&#39;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1"># 使用数据库，如果不将解析的数据传到数据库，可以注释掉</span>
+</span></span><span class="line"><span class="cl">    <span class="n">directory</span> <span class="o">=</span> <span class="s1">&#39;./pdf&#39;</span> <span class="c1"># 下载的pdf文件保存文件夹路径</span>
+</span></span><span class="line"><span class="cl">    <span class="n">infos</span> <span class="o">=</span> <span class="n">get_download_urls</span><span class="p">(</span><span class="s1">&#39;警示函&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">infos</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="s1">&#39;下载链接.xlsx&#39;</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># 将获取到的列表信息保存到本地</span>
+</span></span><span class="line"><span class="cl">    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">infos</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">url</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pdf_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;file_type&#39;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="n">download_pdf</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="n">directory</span><span class="p">,</span><span class="n">pdf_name</span><span class="p">)</span> <span class="c1"># 下载PDF</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;下载文件：</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">pdf_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span><span class="n">pdf_name</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">content</span> <span class="o">=</span> <span class="n">extract_pdf</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">except</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;下载文件失败&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">content</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">row</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># 传数据库,如果不用数据库可以注释掉</span>
+</span></span><span class="line"><span class="cl">        <span class="c1"># upload_mysql(connect,cursor,row,table_name)</span></span></span></code></pre></div>
+<p>由于解析的 PDF 文字很多，直接输出成 Excel 会串行，所以我是在第 4 步<code>保存数据</code>的时候，</p>
+<p>把数据保存在数据库中，然后把数据库的表导出成 Excel 。</p>
+<figure>
+</figure>
+
+<p>为了让读者能执行代码，我把上传数据库的代码注释了，但是解析的<code>content</code>你就看不到。</p>
+<p>如果你会 mysql 数据库，可以把取消注释代码。</p>
+<p>如果你想查询其它的关键词，下载 PDF ，可以修改这行代码的关键词：</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">infos</span> <span class="o">=</span> <span class="n">get_download_urls</span><span class="p">(</span><span class="s1">&#39;警示函&#39;</span><span class="p">)</span></span></span></code></pre></div>
+<h2 id="文件信息及pdf下载">文件信息及PDF下载</h2>
+<p>我把下载好的信息和 PDF 也打包分享大家，有需要的可以直接下载：</p>
+<p><a href="https://pan.baidu.com/s/1tTErvLvPgo0R30WTP9nUvA?pwd=k3sr" target="_blank" rel="noopener noreffer ">https://pan.baidu.com/s/1tTErvLvPgo0R30WTP9nUvA?pwd=k3sr</a></p>
+]]></description>
+</item>
+</channel>
+</rss>

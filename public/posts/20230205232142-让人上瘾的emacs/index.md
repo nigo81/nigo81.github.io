@@ -1,0 +1,114 @@
+# 让人上瘾的emacs
+
+
+作为重度知识使用者，我使用过很多笔记软件。
+
+包括为知笔记、印象笔记、 gingko 、vimwiki。
+
+其中停留在 vimwiki 的时间比较长，它是编辑器之神 vim 的一个插件，用它积累了很多学习、工作的笔记，全部是本地的 makrdown 文件，共享盘同步。
+
+从去年 8 月开始，用上了 emacs ，这个被称为神之编辑器的东西，确实让人上瘾，几乎可以用它来做任何事情。
+
+{{< figure src="/ox-hugo/2023-02-05_23-36-02_screenshot.png" >}}
+
+这个编辑器不仅属于程序员，其实很多国外学术圈的人也很多人使用。
+
+目前我使用它记录笔记、工作安排、 GTD 、写 Python 、写公众号、听收音机、发邮件、读 RSS 。
+
+
+## 读书笔记 {#读书笔记}
+
+{{< figure src="/ox-hugo/2023-02-05_23-42-40_screenshot.png" >}}
+
+在看书时，可以方便地一边记笔记、一边看 PDF ，可以全部使用键盘。
+
+{{< figure src="/ox-hugo/2023-02-05_23-45-26_screenshot.png" >}}
+
+使用`dictionary-overlay`插件，可以在阅读英文时，遇到不懂的单词可以直接标注，后面再次出现也会显示中文。
+
+{{< figure src="/ox-hugo/2023-02-05_23-48-31_screenshot.png" >}}
+
+使用`popweb`插件可以直接实时查有道词典。
+
+搭配着这两个插件，基本上我也不怕读英文文档了。
+
+
+## org-mode {#org-mode}
+
+emacs最强大的就是 org-mode ，可以方便组织文字、图片、链接
+
+{{< figure src="/ox-hugo/2023-02-05_23-52-37_screenshot.png" >}}
+
+每一层级可以方便的折叠，展开，非常有逻辑性。
+
+同时，对于学习代码来说，他还可以直接运行，因此我们可以进行文学编程。
+
+只需要在代码块中按下`C-c C-c`就可以将代码结果运行出来。
+
+{{< figure src="/ox-hugo/2023-02-05_23-55-13_screenshot.png" >}}
+
+如果你喜欢双链笔记，可以使用`org-roam`插件。
+
+
+## 编写代码 {#编写代码}
+
+搭配上`lsp-bridge`插件，可以瞬间变成一个成熟的 IDE ，尤其是如果平时要写多个语言，那么在一个编辑中写书，更高效。
+
+毕竟快捷键都是一套自己熟悉的。
+
+{{< figure src="/ox-hugo/2023-02-06_00-00-36_screenshot.png" >}}
+
+
+## GTD {#gtd}
+
+`org-agenda` 是非常强大的任务管理插件。
+
+在工作时，如果有一项任务来临，按下`C-c c`就可以弹出记录。
+
+{{< figure src="/ox-hugo/2023-02-06_00-06-20_screenshot.png" >}}
+
+输入待办事项、开始时间或结束时间、重要程度
+
+{{< figure src="/ox-hugo/2023-02-06_00-12-53_screenshot.png" >}}
+
+也可以使用番茄钟等对任务的时间消耗进行记录。
+
+
+## RSS {#rss}
+
+可以订阅自己喜欢的一些博客文章或者播客、 B 站关注的 UP 主。
+
+{{< figure src="/ox-hugo/2023-02-06_00-14-32_screenshot.png" >}}
+
+
+## 邮件 {#邮件}
+
+最近也把邮件客户端省了，打开 emacs 就可以查阅和发送邮件。
+
+{{< figure src="/ox-hugo/2023-02-06_00-18-02_screenshot.png" >}}
+
+对联系人也是可以直接补全的。
+
+{{< figure src="/ox-hugo/2023-02-06_00-22-23_screenshot.png" >}}
+
+当收到邮件时，还可以和前面`org-agenda`结合将邮件做一项待办任务，后面再进行处理。
+
+
+## 结语 {#结语}
+
+emacs是一个存在了 40 多年的自由软件，到现在也还具有强大的生命力，可以预见未来的 40 年也将继续存在。
+
+它是神之编辑器，在 windows 、Linux、 Mac 上都可以使用。
+
+如果感兴趣可以看下陈斌写的《一年成为 Emacs 高手 (像神一样使用编辑器)》
+
+<https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/guide-zh.org>
+
+刚开始上手配置比较困难，可以直接使用他的配置文件：
+
+<https://github.com/redguardtoo/emacs.d>
+
+它的配置文件应该是支持 windows 、mac、 linux 的。
+
+不过后面自己熟悉后，还是可以折腾一份自己的配置，毕竟自己能掌控的才是最好的。
+
