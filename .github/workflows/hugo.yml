@@ -80,7 +80,7 @@ jobs:
           APPLICATION_ID: ${{ secrets.ALGOLIA_APPID }}
           ADMIN_API_KEY: ${{ secrets.ALGOLIA_ADMINKEY }}
           INDEX_NAME: ${{ secrets.ALGOLIA_INDEXNAME }}
-          FILE_PATH: "public/index.json"
+          FILE_PATH: "./public/index.json"
 
 
   sync: #同步到gitee仓库
