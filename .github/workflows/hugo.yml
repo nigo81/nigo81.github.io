@@ -73,16 +73,10 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
 
-# 将index.json索引上传到algigo（主要是为了能用搜索功能）
-      - name: Algolia Upload Records
-        # 使用 Action
-        uses: iChochy/Algolia-Upload-Records@main
-        # 设置环境变量
-        env:
-          APPLICATION_ID: L2PH9BYQ9X
-          ADMIN_API_KEY: 19987eb6158ae8873649ad30bbb5cea5
-          INDEX_NAME: nigo81.gitee.io
-          FILE_PATH: public/index.json
+      # 用docker容器上传algolia索引文件
+      # - uses: actions/checkout@v2
+      - name: Run container for atomic-algolia
+        run: docker run --rm -e ALGOLIA_ADMIN_KEY="19987eb6158ae8873649ad30bbb5cea5" -e ALGOLIA_INDEX_FILE=/public/algolia.json -e ALGOLIA_APP_ID="L2PH9BYQ9X" -e ALGOLIA_INDEX_NAME="nigo81.gitee.io" -v $PWD/public:/public registry.cn-shenzhen.aliyuncs.com/lan-k8s/ubuntu:algolia atomic-algolia
 
   sync: #同步到gitee仓库
     needs: deploy
