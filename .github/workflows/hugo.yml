@@ -73,8 +73,9 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v1
 
-
+# 将搜索索引上传到algolia
   upload_algolia_index:
+    needs: deploy
     runs-on: ubuntu-latest
     name: Upload Algolia Index
     steps:
