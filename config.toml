@@ -73,3 +73,26 @@ languageName = "简体中文"
 [outputs]
   home = ["HTML", "RSS", "JSON"]
   page = ["HTML", "MarkDown"]
+
+
+ # xwi88 自定义配置 xwi88Cfg
+[params.xwi88Cfg]
+  [params.xwi88Cfg.summary]
+    update = true # summary 更新日期显示
+  [params.xwi88Cfg.page]
+    update = true # pages 更新日期显示
+  [params.xwi88Cfg.busuanzi]
+    enable = true
+    # custom uv for the whole site
+    site_uv = true
+    site_uv_pre = '<i class="fa fa-user"></i>' # 字符或提示语
+    site_uv_post = ''
+    # custom pv for the whole site
+    site_pv = true
+    site_pv_pre = '<i class="fa fa-eye"></i>'
+    # site_pv_post = '<i class="far fa-eye fa-fw"></i>'
+    site_pv_post = ''
+    # custom pv span for one page only
+    page_pv = true
+    page_pv_pre = '<i class="far fa-eye fa-fw"></i>'
+    page_pv_post = ''
