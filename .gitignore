@@ -1,2 +1,3 @@
 /public/*
+static/ltximg/
 !/public/index.json
